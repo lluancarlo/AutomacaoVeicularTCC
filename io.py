@@ -2,21 +2,23 @@ import RPi.GPIO as io
 import time
 
 class farol:
-	def __init__(pine):
+	def __init__(self, pine):
 		self.pine = pine
 		io.setup(self.pine, io.OUT)
-	def On():
+	def On(self):
 		io.output(self.pine, io.HIGH)
-	def Off():
+	def Off(self):
 		io.output(self.pine, io.LOW)
 
 def initBoard():
+	print("Modulo de Hardware iniciado!\n")
 	io.setmode(io.BOARD)
+	led01 = farol(11)
 
 	while True:
-		io.output(11,io.HIGH)
+		led01.On()
 		time.sleep(2)
-		io.output(11,io.LOW)
+		led01.Off()
 		time.sleep(2)
-
-	io.cleanup()
+	else:
+		io.cleanup()

@@ -13,6 +13,7 @@ class bt:
 		self.server.close()
 
 def receptorBluetooth():
+	print("Modulo receptor Bluetooth iniciado!\n")
 	data = ""
 	b = bt(1)
 	while data != '0':
