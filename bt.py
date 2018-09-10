@@ -1,4 +1,4 @@
-\import bluetooth
+import bluetooth
 
 class bt:
 	def __init__(self,port):

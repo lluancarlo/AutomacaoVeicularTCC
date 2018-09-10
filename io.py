@@ -1,14 +1,22 @@
 import RPi.GPIO as io
 import time
 
-io.setmode(io.BOARD)
+class farol:
+	def __init__(pine):
+		self.pine = pine
+		io.setup(self.pine, io.OUT)
+	def On():
+		io.output(self.pine, io.HIGH)
+	def Off():
+		io.output(self.pine, io.LOW)
 
-io.setup(11, io.OUT)
+def initBoard():
+	io.setmode(io.BOARD)
 
-while True:
-	io.output(11,io.HIGH)
-	time.sleep(2)
-	io.output(11,io.LOW)
-	time.sleep(2)
+	while True:
+		io.output(11,io.HIGH)
+		time.sleep(2)
+		io.output(11,io.LOW)
+		time.sleep(2)
 
-io.cleanuo()
+	io.cleanup()
