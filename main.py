@@ -1,3 +1,4 @@
+
 import bluetooth
 import RPi.GPIO
 import thread as th
@@ -26,11 +27,9 @@ class led:
 		RPi.GPIO.setup(self.pine, RPi.GPIO.OUT)
 	def On(self):
 		RPi.GPIO.output(self.pine, RPi.GPIO.HIGH)
-		print("led ligado!")
 		self.status = 1
 	def Off(self):
 		RPi.GPIO.output(self.pine, RPi.GPIO.LOW)
-		print("led desligado!")
 		self.status = 0
 
 class buzzer:
@@ -63,6 +62,24 @@ class buzzer:
 			self.buzz.ChangeFrequency(melody[x])
 			time.sleep(float(timeNt[x]/1000.000))
 		self.buzz.stop()
+
+	def playMario(self):
+		self.buzz = RPi.GPIO.PWM(self.pine, 1)
+		self.buzz.start(1)
+
+		timeNt = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
+                          120, 120, 120, 120,  90,  90,  90, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
+                          120, 120, 120, 120, 120, 120, 120,  90,  90,  90, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
+		melody = [2637, 2637, 250, 2637, 250, 2093, 2637, 250, 3136, 250, 250,  250, 1568, 250, 250, 250, 2093, 250, 250, 1568, 250, 250, 1319, 250, 250,
+			  1760, 250, 1976, 250, 1865, 1760, 250, 1568, 2637, 3136, 3520, 250, 2794, 3136, 250, 2637, 250, 2093, 2349, 1976, 250, 250, 2093, 250,
+			  250, 1568, 250, 250, 1319, 250, 250, 1760, 250, 1976, 250, 1865,  1760, 250, 1568, 2637, 3136, 3520, 250, 2794, 3136, 250, 2637, 250,
+			  2093, 2349, 1976, 250, 250]
+
+		for x in range(0,len(melody),1):
+			self.buzz.ChangeFrequency(melody[x])
+			time.sleep(float(timeNt[x]/1000.000))
+		self.buzz.stop()
+
 	def playPirates(self):
 		self.buzz = RPi.GPIO.PWM(self.pine, 1)
 		self.buzz.start(1)
@@ -147,9 +164,19 @@ if __name__ == "__main__":
 					farol.Off()
 			elif (op=='3'):
 				if (bozina.status ==0):
-					bozina.playPirates()
+					bozina.playStarWars()
 				else:
 					bozina.Off()
+			elif (op=='4'):
+				if (bozina.status ==0):
+					bozina.playPirates()
+				else:
+					bozina.off()
+			elif(op=='5'):
+				if (bozina.status ==0):
+					bozina.playMario()
+				else:
+					bozina.off()
 		else:
 			bth.sendMsg('\nDesconectando..\n\n')
 			bth.close()
