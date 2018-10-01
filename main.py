@@ -137,35 +137,15 @@ if __name__ == "__main__":
 	l = led(11)
 	l.On()
 
-	"""
-	def Test():
-		RPi.GPIO.setmode(RPi.GPIO.BOARD)
-		trig = 20
-		echo = 21
-		RPi.GPIO.setup(trig, GPIO.OUT)
-		RPi.GPIO.setup(echo, GPIO.IN)
+	#Def Driver
+        motoristaA = driver('Luan Carlo', '23/09/1997', '12345678910', 'A', '16/10/2020', '13.876,27','9,6 Km/L', '39M')
+        motoristaB = driver('Thiago Almeida', '05/07/19??', '12345678910', 'A, B', '02/03/2021', '6.285,03','8,2 Km/L', '1H 13M')
+        motoristaC = driver('Jose Camacho', '01/02/19??', '12345678910', 'A, D', '19/06/2023', '8.189,62','10,2 Km/L', '1H 35M')
 
-		RPi.GPIO.output(trig, false)
-		print("Pegando Distancia..")
-		time.sleep(2)
-
-		RPi.GPIO.output(trig, true)
-		time.sleep(1)
-		RPi.GPIO.output(trig, false)
-
-		while RPi.GPIO.input(echo) == 0:
-			pulse_start = time.time()
-
-		while RPi.GPIO.input(echo) == 1:
-			pulse_end = time.time()
-
-		pulse_duration = pulse_end - pulse_start
-		distance = pulse_duration * 17150
-
-		distance = round(distance, 2)
-
-		print("A distancia e ",distance," cm")
-	"""
+        #imports
+        farol = led(40)
+        bozina = buzzer(36)
+        mot = motor(32)
 
 	def turnOnBt():
 		os.system('hciconfig hci0 piscan')
@@ -173,16 +153,6 @@ if __name__ == "__main__":
 		bth = bt(1)
 		bth.connect()
 		bth.sendMsg('\n[COMANDO] -> ')
-
-		#Def Driver
-		motoristaA = driver('Luan Carlo', '23/09/1997', '12345678910', 'A', '16/10/2020', '13.876,27','9,6 Km/L', '39M')
-		motoristaB = driver('Thiago Almeida', '05/07/19??', '12345678910', 'A, B', '02/03/2021', '6.285,03','8,2 Km/L', '1H 13M')
-		motoristaC = driver('Jose Camacho', '01/02/19??', '12345678910', 'A, D', '19/06/2023', '8.189,62','10,2 Km/L', '1H 35M')
-
-		#imports
-		farol = led(40)
-		bozina = buzzer(36)
-		mot = motor(32)
 
 		#Process
 		while op != 'z':
@@ -230,4 +200,5 @@ if __name__ == "__main__":
 			bth.sendMsg('\n\n[DESLIGANDO SISTEMA...]')
 			bth.close()
 			os.system('shutdown')
+
 	turnOnBt()
