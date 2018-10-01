@@ -5,6 +5,16 @@ import thread as th
 import time
 import os
 
+class driver:
+	def __init__(self, nome, dtanasc, cnh, cnhtip, dtavenc, totalkm, mediakm, mediatemp):
+		self.nome = nome
+		self.dtanasc = dtanasc
+		self.cnh = cnh
+		self.cnhtip = cnhtip
+		self.dtavenc = dtavenc
+		self.totalkm = totalkm
+		self.mediakm = mediakm
+		self.mediatemp = mediatemp
 class bt:
 	def __init__(self, port):
 		self.server = bluetooth.BluetoothSocket( bluetooth.RFCOMM )
@@ -31,6 +41,18 @@ class led:
 	def Off(self):
 		RPi.GPIO.output(self.pine, RPi.GPIO.LOW)
 		self.status = 0
+
+class motor:
+        status = 0
+        def __init__(self, pine):
+                self.pine = pine
+                RPi.GPIO.setup(self.pine, RPi.GPIO.OUT)
+        def On(self):
+                RPi.GPIO.output(self.pine, RPi.GPIO.HIGH)
+                self.status = 1
+        def Off(self):
+                RPi.GPIO.output(self.pine, RPi.GPIO.LOW)
+                self.status = 0
 
 class buzzer:
 	status = 0
@@ -70,7 +92,7 @@ class buzzer:
 		timeNt = [120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
                           120, 120, 120, 120,  90,  90,  90, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
                           120, 120, 120, 120, 120, 120, 120,  90,  90,  90, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120]
-		melody = [2637, 2637, 250, 2637, 250, 2093, 2637, 250, 3136, 250, 250,  250, 1568, 250, 250, 250, 2093, 250, 250, 1568, 250, 250, 1319, 250, 250,
+		melody = [2637, 2637, 250, 2637, 250, 2093, 2637, 250, 3136, 250,  250, 250, 1568, 250, 250, 250, 2093, 250, 250, 1568, 250, 250, 1319, 250, 250,
 			  1760, 250, 1976, 250, 1865, 1760, 250, 1568, 2637, 3136, 3520, 250, 2794, 3136, 250, 2637, 250, 2093, 2349, 1976, 250, 250, 2093, 250,
 			  250, 1568, 250, 250, 1319, 250, 250, 1760, 250, 1976, 250, 1865,  1760, 250, 1568, 2637, 3136, 3520, 250, 2794, 3136, 250, 2637, 250,
 			  2093, 2349, 1976, 250, 250]
@@ -112,6 +134,8 @@ class buzzer:
 if __name__ == "__main__":
 	#Set Global Board Mode
 	RPi.GPIO.setmode(RPi.GPIO.BOARD)
+	l = led(11)
+	l.On()
 
 	"""
 	def Test():
@@ -148,20 +172,34 @@ if __name__ == "__main__":
 		op = ''
 		bth = bt(1)
 		bth.connect()
-		bth.sendMsg('\nConectado!\t\n\n')
+		bth.sendMsg('\n[COMANDO] -> ')
+
+		#Def Driver
+		motoristaA = driver('Luan Carlo', '23/09/1997', '12345678910', 'A', '16/10/2020', '13.876,27','9,6 Km/L', '39M')
+		motoristaB = driver('Thiago Almeida', '05/07/19??', '12345678910', 'A, B', '02/03/2021', '6.285,03','8,2 Km/L', '1H 13M')
+		motoristaC = driver('Jose Camacho', '01/02/19??', '12345678910', 'A, D', '19/06/2023', '8.189,62','10,2 Km/L', '1H 35M')
 
 		#imports
 		farol = led(40)
 		bozina = buzzer(36)
+		mot = motor(32)
 
 		#Process
-		while op != '0':
+		while op != 'z':
 			op = bth.recvMsg()
 			if (op=='1'):
 				if (farol.status == 0):
 					farol.On()
+					bth.sendMsg('\n\n[SISTEMA] -> Farol Ligado!')
 				else:
 					farol.Off()
+					bth.sendMsg('\n\n[SISTEMA] -> Farol Desligado!')
+				bth.sendMsg('\n\n[COMANDO] ->  ')
+			elif (op=='2'):
+                                if (mot.status ==0):
+                                        mot.On()
+                                else:
+                                        mot.Off()
 			elif (op=='3'):
 				if (bozina.status ==0):
 					bozina.playStarWars()
@@ -177,7 +215,19 @@ if __name__ == "__main__":
 					bozina.playMario()
 				else:
 					bozina.off()
+			elif(op=='a'):
+				bth.sendMsg('\n\n[MOTORISTA A] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaA.nome, motoristaA.dtanasc, motoristaA.cnh, motoristaA.cnhtip, motoristaA.dtavenc, motoristaA.totalkm, motoristaA.mediakm, motoristaA.mediatemp))
+				bth.sendMsg('\n\n[COMANDO] ->  ')
+			elif(op=='b'):
+                                bth.sendMsg('\n\n[MOTORISTA B] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaB.nome, motoristaB.dtanasc, motoristaB.cnh, motoristaB.cnhtip, motoristaB.dtavenc, motoristaB.totalkm, motoristaB.mediakm, motoristaB.mediatemp))
+                                bth.sendMsg('\n\n[COMANDO] ->  ')
+			elif(op=='c'):
+                                bth.sendMsg('\n\n[MOTORISTA C] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaC.nome, motoristaC.dtanasc, motoristaC.cnh, motoristaC.cnhtip, motoristaC.dtavenc, motoristaC.totalkm, motoristaC.mediakm, motoristaC.mediatemp))
+                                bth.sendMsg('\n\n[COMANDO] ->  ')
+
 		else:
-			bth.sendMsg('\nDesconectando..\n\n')
+			l.Off()
+			bth.sendMsg('\n\n[DESLIGANDO SISTEMA...]')
 			bth.close()
+			os.system('shutdown')
 	turnOnBt()
