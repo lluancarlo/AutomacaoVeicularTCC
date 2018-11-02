@@ -199,6 +199,7 @@ if __name__ == "__main__":
 			l.Off()
 			bth.sendMsg('\n\n[DESLIGANDO SISTEMA...]')
 			bth.close()
+			RPi.GPIO.cleanup()
 			os.system('shutdown')
 
 	turnOnBt()
