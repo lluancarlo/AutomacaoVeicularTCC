@@ -41,6 +41,38 @@ class led:
 	def Off(self):
 		RPi.GPIO.output(self.pine, RPi.GPIO.LOW)
 		self.status = 0
+class rgb:
+	statusR = 0
+	statusG = 0
+	statusB = 0
+	def __init__(self, pineR, pineG, pineB):
+		self.pineR = pineR
+		self.pineG = pineG
+		self.pineB = pineB
+		RPi.GPIO.setup(self.pineR, RPi.GPIO.OUT)
+		RPi.GPIO.setup(self.pineG, RPi.GPIO.OUT)
+		RPi.GPIO.setup(self.pineB, RPi.GPIO.OUT)
+	def Red(self):
+		if not self.statusR:
+			RPi.GPIO.output(self.pineR, RPi.GPIO.HIGH)
+			self.statusR = 1
+		else:
+			RPi.GPIO.output(self.pineR, RPi.GPIO.LOW)
+			self.statusR = 0
+	def Green(self):
+                if not self.statusG:
+                        RPi.GPIO.output(self.pineG, RPi.GPIO.HIGH)
+			self.statusG = 1
+                else:
+                        RPi.GPIO.output(self.pineG, RPi.GPIO.LOW)
+			self.statusG = 0
+	def Blue(self):
+                if not self.statusB:
+                        RPi.GPIO.output(self.pineB, RPi.GPIO.HIGH)
+			self.statusB = 1
+                else:
+                        RPi.GPIO.output(self.pineB, RPi.GPIO.LOW)
+			self.statusB = 0
 
 class motor:
         status = 0
@@ -116,15 +148,15 @@ class buzzer:
 			  375, 375, 250, 125, 375, 250, 125, 375, 125, 125, 125, 125, 125, 125, 125, 125, 375, 250, 125, 375, 250,
 			  125, 375, 125, 125, 125, 125, 125, 500, 250, 125, 375, 250, 125, 375, 125, 125, 125, 125, 125, 125, 125,
 			  125, 375, 250, 125, 375, 250, 125, 375, 125, 125, 125, 125, 125, 500]
-		melody = [330, 392, 440, 440,250, 440, 494, 523, 523,250, 523, 587, 494, 494,250, 440, 392, 440,250, 330, 392, 440, 440,
-                           250, 440, 494, 523, 523,250, 523, 587, 494, 494,250, 440, 392, 440,250, 330, 392, 440, 440,250, 440, 523, 587,
-                          587,250, 587, 659, 698, 698,250, 659, 587, 659, 440,250, 440, 494, 523, 523,250, 587, 659, 440,250, 440, 523,
-                          494, 494,250, 523, 440, 494,250, 440, 440, 440, 494, 523, 523,250, 523, 587, 494, 494,250, 440, 392, 440,250,
-                          330, 392, 440, 440,250, 440, 494, 523, 523,250, 523, 587, 494, 494,250, 440, 392, 440,250, 330, 392, 440, 440,
-                           250, 440, 523, 587, 587,250, 587, 659, 698, 698,250, 659, 587, 659, 440,250, 440, 494, 523, 523,250, 587, 659,
-                          440,250, 440, 523, 494, 494,250, 523, 440, 494,250, 659,250,250, 698,250,250, 659, 659,250, 784,250, 659, 587,250,250,
-                          587,250,250, 523,250,250, 494, 523,250, 494,250, 440, 659,250,250, 698,250,250, 659, 659,250, 784,250, 659, 587,250,250,
-                          587,250,250, 523,250,250, 494, 523,250, 494,250, 440]
+		melody = [330, 392, 440, 440, 250, 440, 494, 523, 523, 250, 523, 587, 494, 494, 250, 440, 392, 440, 250, 330, 392, 440, 440,
+                          250, 440, 494, 523, 523, 250, 523, 587, 494, 494, 250, 440, 392, 440, 250, 330, 392, 440, 440, 250, 440, 523, 587,
+                          587, 250, 587, 659, 698, 698, 250, 659, 587, 659, 440, 250, 440, 494, 523, 523, 250, 587, 659, 440, 250, 440, 523,
+                          494, 494, 250, 523, 440, 494, 250, 440, 440, 440, 494, 523, 523, 250, 523, 587, 494, 494, 250, 440, 392, 440, 250,
+                          330, 392, 440, 440, 250, 440, 494, 523, 523, 250, 523, 587, 494, 494, 250, 440, 392, 440, 250, 330, 392, 440, 440,
+                          250, 440, 523, 587, 587, 250, 587, 659, 698, 698, 250, 659, 587, 659, 440, 250, 440, 494, 523, 523, 250, 587, 659,
+                          440, 250, 440, 523, 494, 494, 250, 523, 440, 494, 250, 659, 250, 250, 698, 250, 250, 659, 659, 250, 784, 250, 659,
+			  587, 250, 250, 587, 250, 250, 523, 250, 250, 494, 523, 250, 494, 250, 440, 659, 250, 250, 698, 250, 250, 659, 659,
+			  250, 784, 250, 659, 587, 250, 250, 587, 250, 250, 523, 250, 250, 494, 523, 250, 494, 250, 440]
 
 		for x in range(0,len(melody),1):
 			self.buzz.ChangeFrequency(melody[x])
@@ -134,7 +166,7 @@ class buzzer:
 if __name__ == "__main__":
 	#Set Global Board Mode
 	RPi.GPIO.setmode(RPi.GPIO.BOARD)
-	l = led(11)
+	l = led(12)
 	l.On()
 
 	#Def Driver
@@ -145,7 +177,7 @@ if __name__ == "__main__":
         #imports
         farol = led(40)
         bozina = buzzer(36)
-        mot = motor(32)
+        ledrgb = rgb(15,13,11)
 
 	def turnOnBt():
 		os.system('hciconfig hci0 piscan')
@@ -160,16 +192,10 @@ if __name__ == "__main__":
 			if (op=='1'):
 				if (farol.status == 0):
 					farol.On()
-					bth.sendMsg('\n\n[SISTEMA] -> Farol Ligado!')
 				else:
 					farol.Off()
-					bth.sendMsg('\n\n[SISTEMA] -> Farol Desligado!')
-				bth.sendMsg('\n\n[COMANDO] ->  ')
 			elif (op=='2'):
-                                if (mot.status ==0):
-                                        mot.On()
-                                else:
-                                        mot.Off()
+                        	pass
 			elif (op=='3'):
 				if (bozina.status ==0):
 					bozina.playStarWars()
@@ -185,13 +211,19 @@ if __name__ == "__main__":
 					bozina.playMario()
 				else:
 					bozina.off()
-			elif(op=='a'):
+			elif(op=='r'):
+				ledrgb.Red()
+			elif(op=='g'):
+				ledrgb.Green()
+			elif(op=='b'):
+				ledrgb.Blue()
+			elif(op=='m'):
 				bth.sendMsg('\n\n[MOTORISTA A] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaA.nome, motoristaA.dtanasc, motoristaA.cnh, motoristaA.cnhtip, motoristaA.dtavenc, motoristaA.totalkm, motoristaA.mediakm, motoristaA.mediatemp))
 				bth.sendMsg('\n\n[COMANDO] ->  ')
-			elif(op=='b'):
+			elif(op=='n'):
                                 bth.sendMsg('\n\n[MOTORISTA B] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaB.nome, motoristaB.dtanasc, motoristaB.cnh, motoristaB.cnhtip, motoristaB.dtavenc, motoristaB.totalkm, motoristaB.mediakm, motoristaB.mediatemp))
                                 bth.sendMsg('\n\n[COMANDO] ->  ')
-			elif(op=='c'):
+			elif(op=='o'):
                                 bth.sendMsg('\n\n[MOTORISTA C] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaC.nome, motoristaC.dtanasc, motoristaC.cnh, motoristaC.cnhtip, motoristaC.dtavenc, motoristaC.totalkm, motoristaC.mediakm, motoristaC.mediatemp))
                                 bth.sendMsg('\n\n[COMANDO] ->  ')
 
