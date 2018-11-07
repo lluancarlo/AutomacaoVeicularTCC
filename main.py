@@ -1,9 +1,8 @@
-
 import bluetooth
 import RPi.GPIO
-import thread as th
 import time
 import os
+from multiprocessing import Process
 
 class driver:
 	def __init__(self, nome, dtanasc, cnh, cnhtip, dtavenc, totalkm, mediakm, mediatemp):
@@ -91,16 +90,7 @@ class buzzer:
 	def __init__(self, pine):
 		self.pine = pine
 		RPi.GPIO.setup(self.pine, RPi.GPIO.OUT)
-	def play1(self):
-		self.buzz = RPi.GPIO.PWM(self.pine, 1)
-		self.buzz.start(1)
-		for dc in range(150,1800,10):
-			self.buzz.ChangeFrequency(dc)
-			time.sleep(0.01)
-		for dc in range(1800, 150, -10):
-			self.buzz.ChangeFrequency(dc)
-			time.sleep(0.01)
-		self.buzz.stop()
+
 	def playStarWars(self):
 		self.buzz = RPi.GPIO.PWM(self.pine, 1)
 		self.buzz.start(1)
@@ -163,11 +153,20 @@ class buzzer:
 			time.sleep(float(timeNt[x]/1000.000))
 		self.buzz.stop()
 
-if __name__ == "__main__":
-	#Set Global Board Mode
-	RPi.GPIO.setmode(RPi.GPIO.BOARD)
-	l = led(12)
-	l.On()
+	def playWarning(self):
+                self.buzz = RPi.GPIO.PWM(self.pine, 1)
+                self.buzz.start(1)
+
+                timeNt = [2000]
+                melody = [600]
+
+                for x in range(0,len(melody),1):
+		        self.buzz.ChangeFrequency(melody[x])
+                        time.sleep(float(timeNt[x]/1000.000))
+                self.buzz.stop()
+
+def mod_bt():
+	print('[SISTEMA] Modulo Bluetooth Iniciado!')
 
 	#Def Driver
         motoristaA = driver('Luan Carlo', '23/09/1997', '12345678910', 'A', '16/10/2020', '13.876,27','9,6 Km/L', '39M')
@@ -179,59 +178,103 @@ if __name__ == "__main__":
         bozina = buzzer(36)
         ledrgb = rgb(15,13,11)
 
-	def turnOnBt():
-		os.system('hciconfig hci0 piscan')
-		op = ''
-		bth = bt(1)
-		bth.connect()
-		bth.sendMsg('\n[COMANDO] -> ')
 
-		#Process
-		while op != 'z':
-			op = bth.recvMsg()
-			if (op=='1'):
-				if (farol.status == 0):
-					farol.On()
-				else:
-					farol.Off()
-			elif (op=='2'):
-                        	pass
-			elif (op=='3'):
-				if (bozina.status ==0):
-					bozina.playStarWars()
-				else:
-					bozina.Off()
-			elif (op=='4'):
-				if (bozina.status ==0):
-					bozina.playPirates()
-				else:
-					bozina.off()
-			elif(op=='5'):
-				if (bozina.status ==0):
-					bozina.playMario()
-				else:
-					bozina.off()
-			elif(op=='r'):
-				ledrgb.Red()
-			elif(op=='g'):
-				ledrgb.Green()
-			elif(op=='b'):
-				ledrgb.Blue()
-			elif(op=='m'):
-				bth.sendMsg('\n\n[MOTORISTA A] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaA.nome, motoristaA.dtanasc, motoristaA.cnh, motoristaA.cnhtip, motoristaA.dtavenc, motoristaA.totalkm, motoristaA.mediakm, motoristaA.mediatemp))
-				bth.sendMsg('\n\n[COMANDO] ->  ')
-			elif(op=='n'):
-                                bth.sendMsg('\n\n[MOTORISTA B] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaB.nome, motoristaB.dtanasc, motoristaB.cnh, motoristaB.cnhtip, motoristaB.dtavenc, motoristaB.totalkm, motoristaB.mediakm, motoristaB.mediatemp))
-                                bth.sendMsg('\n\n[COMANDO] ->  ')
-			elif(op=='o'):
-                                bth.sendMsg('\n\n[MOTORISTA C] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaC.nome, motoristaC.dtanasc, motoristaC.cnh, motoristaC.cnhtip, motoristaC.dtavenc, motoristaC.totalkm, motoristaC.mediakm, motoristaC.mediatemp))
-                                bth.sendMsg('\n\n[COMANDO] ->  ')
+	os.system('hciconfig hci0 piscan')
+	op = ''
+	bth = bt(1)
+	bth.connect()
 
-		else:
-			l.Off()
-			bth.sendMsg('\n\n[DESLIGANDO SISTEMA...]')
-			bth.close()
-			RPi.GPIO.cleanup()
-			os.system('shutdown')
 
-	turnOnBt()
+	bth.sendMsg('\n[COMANDO] -> ')
+
+	#Process
+	while op != 'z':
+		op = bth.recvMsg()
+		if (op=='1'):
+			if (farol.status == 0):
+				farol.On()
+			else:
+				farol.Off()
+		elif (op=='3'):
+			if (bozina.status ==0):
+				bozina.playStarWars()
+			else:
+				bozina.Off()
+		elif (op=='4'):
+			if (bozina.status ==0):
+				bozina.playPirates()
+			else:
+				bozina.off()
+		elif(op=='5'):
+			if (bozina.status ==0):
+				bozina.playMario()
+			else:
+				bozina.off()
+		elif(op=='r'):
+			ledrgb.Red()
+		elif(op=='g'):
+			ledrgb.Green()
+		elif(op=='b'):
+			ledrgb.Blue()
+		elif(op=='m'):
+			bth.sendMsg('\n\n[MOTORISTA A] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaA.nome, motoristaA.dtanasc, motoristaA.cnh, motoristaA.cnhtip, motoristaA.dtavenc, motoristaA.totalkm, motoristaA.mediakm, motoristaA.mediatemp))
+			bth.sendMsg('\n\n[COMANDO] ->  ')
+		elif(op=='n'):
+			bth.sendMsg('\n\n[MOTORISTA B] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaB.nome, motoristaB.dtanasc, motoristaB.cnh, motoristaB.cnhtip, motoristaB.dtavenc, motoristaB.totalkm, motoristaB.mediakm, motoristaB.mediatemp))
+			bth.sendMsg('\n\n[COMANDO] ->  ')
+		elif(op=='o'):
+			bth.sendMsg('\n\n[MOTORISTA C] \n[NOME] -> {}\n[NASC] -> {}\n[CNH] -> {}\n[TIPO] -> {}\n[VENC] ->{}\n[TOTAL KM] -> {}\n[MEDIA KM] -> {}\n[MEDIA TEMPO] -> {}'.format(motoristaC.nome, motoristaC.dtanasc, motoristaC.cnh, motoristaC.cnhtip, motoristaC.dtavenc, motoristaC.totalkm, motoristaC.mediakm, motoristaC.mediatem))
+			bth.sendMsg('\n\n[COMANDO] ->  ')
+	else:
+		l.Off()
+		bth.sendMsg('\n\n[DESLIGANDO SISTEMA...]')
+		bth.close()
+		RPi.GPIO.cleanup()
+		os.system('shutdown')
+
+def mod_loop():
+	print('[SISTEMA] Modulo Loop Iniciado!')
+
+	RPi.GPIO.setup(18, RPi.GPIO.IN)
+	RPi.GPIO.setup(16, RPi.GPIO.OUT)
+
+	bozina = buzzer(36)
+	led = rgb(15,13,11)
+
+	while True:
+		RPi.GPIO.output(16, False)
+		time.sleep(0.5)
+		RPi.GPIO.output(16, True)
+        	time.sleep(0.00001)
+	        RPi.GPIO.output(16, False)
+	        tempoInicio = time.time();
+
+        	while RPi.GPIO.input(18)==0:
+	                tempoInicio = time.time()
+        	while RPi.GPIO.input(18)==1:
+                	tempoFinal = time.time()
+
+	        var = tempoFinal-tempoInicio
+	        somVolta = var * 17000
+	        somvolta = round(somVolta, 2)
+
+		if (somVolta < 20):
+			led.Red()
+			bozina.playWarning()
+			led.Red()
+
+if __name__ == "__main__":
+	#Set Global Board Mode
+        RPi.GPIO.setmode(RPi.GPIO.BOARD)
+        RPi.GPIO.setwarnings(False)
+        l = led(12)
+        l.On()
+
+        p1 = Process(target=mod_bt, args=())
+	p2 = Process(target=mod_loop, args=())
+
+        p1.start()
+	p2.start()
+
+	p1.join()
+	p2.join()
